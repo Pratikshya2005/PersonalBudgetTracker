@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using PersonalBudgetTracker.Models;
@@ -8,13 +9,21 @@ namespace PersonalBudgetTracker
 {
     public partial class Form1 : Form
     {
-        private readonly TransactionManager transactionManager =
-            new TransactionManager();
+        private readonly TransactionManager transactionManager;
+
+        private readonly JsonStorageService storageService;
 
         public Form1()
         {
+            transactionManager =
+                new TransactionManager();
+
+            storageService =
+                new JsonStorageService();
+
             InitializeComponent();
             ConfigureForm();
+            LoadSavedTransactions();
             RefreshTransactionGrid();
         }
 
@@ -37,7 +46,36 @@ namespace PersonalBudgetTracker
             dtpDate.Value = DateTime.Today;
         }
 
-        private void btnAdd_Click(object sender, EventArgs e)
+        private void LoadSavedTransactions()
+        {
+            try
+            {
+                List<Transaction> savedTransactions =
+                    storageService.LoadTransactions();
+
+                transactionManager.ReplaceTransactions(
+                    savedTransactions);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    "Previously saved transactions could not " +
+                    "be loaded.\n\n" + ex.Message,
+                    "Loading Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+            }
+        }
+
+        private void SaveTransactions()
+        {
+            storageService.SaveTransactions(
+                transactionManager.Transactions);
+        }
+
+        private void btnAdd_Click(
+            object sender,
+            EventArgs e)
         {
             try
             {
@@ -47,23 +85,27 @@ namespace PersonalBudgetTracker
 
                 if (cmbType.Text == "Income")
                 {
-                    transaction = new IncomeTransaction(
-                        dtpDate.Value.Date,
-                        cmbCategory.Text,
-                        txtDescription.Text.Trim(),
-                        nudAmount.Value);
+                    transaction =
+                        new IncomeTransaction(
+                            dtpDate.Value.Date,
+                            cmbCategory.Text,
+                            txtDescription.Text.Trim(),
+                            nudAmount.Value);
                 }
                 else
                 {
-                    transaction = new ExpenseTransaction(
-                        dtpDate.Value.Date,
-                        cmbCategory.Text,
-                        txtDescription.Text.Trim(),
-                        nudAmount.Value);
+                    transaction =
+                        new ExpenseTransaction(
+                            dtpDate.Value.Date,
+                            cmbCategory.Text,
+                            txtDescription.Text.Trim(),
+                            nudAmount.Value);
                 }
 
-                transactionManager.AddTransaction(transaction);
+                transactionManager.AddTransaction(
+                    transaction);
 
+                SaveTransactions();
                 RefreshTransactionGrid();
                 ClearInputs();
 
@@ -84,14 +126,17 @@ namespace PersonalBudgetTracker
             catch (Exception ex)
             {
                 MessageBox.Show(
-                    "An unexpected error occurred: " + ex.Message,
+                    "The transaction could not be saved.\n\n" +
+                    ex.Message,
                     "Application Error",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
             }
         }
 
-        private void btnDelete_Click(object sender, EventArgs e)
+        private void btnDelete_Click(
+            object sender,
+            EventArgs e)
         {
             try
             {
@@ -102,7 +147,10 @@ namespace PersonalBudgetTracker
                 }
 
                 object idValue =
-                    dgvTransactions.CurrentRow.Cells["Id"].Value;
+                    dgvTransactions
+                        .CurrentRow
+                        .Cells["Id"]
+                        .Value;
 
                 if (idValue == null)
                 {
@@ -110,20 +158,26 @@ namespace PersonalBudgetTracker
                         "The selected transaction is invalid.");
                 }
 
-                Guid transactionId = (Guid)idValue;
+                Guid transactionId =
+                    (Guid)idValue;
 
-                DialogResult answer = MessageBox.Show(
-                    "Are you sure you want to delete this transaction?",
-                    "Delete Transaction",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Question);
+                DialogResult answer =
+                    MessageBox.Show(
+                        "Are you sure you want to delete " +
+                        "this transaction?",
+                        "Delete Transaction",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Question);
 
                 if (answer != DialogResult.Yes)
                 {
                     return;
                 }
 
-                transactionManager.DeleteTransaction(transactionId);
+                transactionManager.DeleteTransaction(
+                    transactionId);
+
+                SaveTransactions();
                 RefreshTransactionGrid();
 
                 MessageBox.Show(
@@ -156,7 +210,8 @@ namespace PersonalBudgetTracker
                     "Please select a category.");
             }
 
-            if (string.IsNullOrWhiteSpace(txtDescription.Text))
+            if (string.IsNullOrWhiteSpace(
+                txtDescription.Text))
             {
                 throw new ArgumentException(
                     "Please enter a transaction description.");
@@ -165,7 +220,8 @@ namespace PersonalBudgetTracker
             if (nudAmount.Value <= 0)
             {
                 throw new ArgumentException(
-                    "The transaction amount must be greater than zero.");
+                    "The transaction amount must be " +
+                    "greater than zero.");
             }
         }
 
@@ -174,11 +230,13 @@ namespace PersonalBudgetTracker
             dgvTransactions.DataSource = null;
 
             dgvTransactions.DataSource =
-                transactionManager.Transactions
+                transactionManager
+                    .Transactions
                     .Select(item => new
                     {
                         item.Id,
-                        Date = item.Date.ToShortDateString(),
+                        Date =
+                            item.Date.ToShortDateString(),
                         item.Type,
                         item.Category,
                         item.Description,
@@ -188,13 +246,17 @@ namespace PersonalBudgetTracker
 
             if (dgvTransactions.Columns["Id"] != null)
             {
-                dgvTransactions.Columns["Id"].Visible = false;
+                dgvTransactions
+                    .Columns["Id"]
+                    .Visible = false;
             }
 
             if (dgvTransactions.Columns["Amount"] != null)
             {
-                dgvTransactions.Columns["Amount"]
-                    .DefaultCellStyle.Format = "C2";
+                dgvTransactions
+                    .Columns["Amount"]
+                    .DefaultCellStyle
+                    .Format = "C2";
             }
 
             RefreshSummary();
@@ -203,31 +265,46 @@ namespace PersonalBudgetTracker
         private void RefreshSummary()
         {
             decimal totalIncome =
-                transactionManager.CalculateTotalIncome();
+                transactionManager
+                    .CalculateTotalIncome();
 
             decimal totalExpenses =
-                transactionManager.CalculateTotalExpenses();
+                transactionManager
+                    .CalculateTotalExpenses();
 
             decimal balance =
-                transactionManager.CalculateBalance();
+                transactionManager
+                    .CalculateBalance();
 
             lblTotalIncome.Text =
-                "Total Income: " + totalIncome.ToString("C2");
+                "Total Income: " +
+                totalIncome.ToString("C2");
 
             lblTotalExpenses.Text =
-                "Total Expenses: " + totalExpenses.ToString("C2");
+                "Total Expenses: " +
+                totalExpenses.ToString("C2");
 
             lblBalance.Text =
-                "Current Balance: " + balance.ToString("C2");
+                "Current Balance: " +
+                balance.ToString("C2");
         }
 
         private void ClearInputs()
         {
-            dtpDate.Value = DateTime.Today;
-            cmbType.SelectedIndex = 0;
-            cmbCategory.SelectedIndex = 0;
+            dtpDate.Value =
+                DateTime.Today;
+
+            cmbType.SelectedIndex =
+                0;
+
+            cmbCategory.SelectedIndex =
+                0;
+
             txtDescription.Clear();
-            nudAmount.Value = 0;
+
+            nudAmount.Value =
+                0;
+
             txtDescription.Focus();
         }
     }
