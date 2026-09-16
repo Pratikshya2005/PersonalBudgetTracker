@@ -43,6 +43,22 @@ namespace PersonalBudgetTracker
             cmbCategory.Items.Add("Other");
             cmbCategory.SelectedIndex = 0;
 
+            cmbFilterType.Items.Clear();
+            cmbFilterType.Items.Add("All Types");
+            cmbFilterType.Items.Add("Income");
+            cmbFilterType.Items.Add("Expense");
+            cmbFilterType.SelectedIndex = 0;
+
+            cmbFilterCategory.Items.Clear();
+            cmbFilterCategory.Items.Add("All Categories");
+            cmbFilterCategory.Items.Add("Salary");
+            cmbFilterCategory.Items.Add("Food");
+            cmbFilterCategory.Items.Add("Transport");
+            cmbFilterCategory.Items.Add("Bills");
+            cmbFilterCategory.Items.Add("Entertainment");
+            cmbFilterCategory.Items.Add("Other");
+            cmbFilterCategory.SelectedIndex = 0;
+
             dtpDate.Value = DateTime.Today;
         }
 
@@ -179,12 +195,6 @@ namespace PersonalBudgetTracker
 
                 SaveTransactions();
                 RefreshTransactionGrid();
-
-                MessageBox.Show(
-                    "Transaction deleted successfully.",
-                    "Transaction Deleted",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
@@ -194,6 +204,29 @@ namespace PersonalBudgetTracker
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Warning);
             }
+        }
+
+        private void cmbFilter_SelectedIndexChanged(
+            object sender,
+            EventArgs e)
+        {
+            if (cmbFilterType.SelectedIndex == -1 ||
+                cmbFilterCategory.SelectedIndex == -1)
+            {
+                return;
+            }
+
+            RefreshTransactionGrid();
+        }
+
+        private void btnClearFilter_Click(
+            object sender,
+            EventArgs e)
+        {
+            cmbFilterType.SelectedIndex = 0;
+            cmbFilterCategory.SelectedIndex = 0;
+
+            RefreshTransactionGrid();
         }
 
         private void ValidateTransactionInput()
@@ -227,11 +260,25 @@ namespace PersonalBudgetTracker
 
         private void RefreshTransactionGrid()
         {
+            string selectedType =
+                cmbFilterType.SelectedIndex == -1
+                    ? "All Types"
+                    : cmbFilterType.Text;
+
+            string selectedCategory =
+                cmbFilterCategory.SelectedIndex == -1
+                    ? "All Categories"
+                    : cmbFilterCategory.Text;
+
+            List<Transaction> filteredTransactions =
+                transactionManager.GetFilteredTransactions(
+                    selectedType,
+                    selectedCategory);
+
             dgvTransactions.DataSource = null;
 
             dgvTransactions.DataSource =
-                transactionManager
-                    .Transactions
+                filteredTransactions
                     .Select(item => new
                     {
                         item.Id,
@@ -291,20 +338,11 @@ namespace PersonalBudgetTracker
 
         private void ClearInputs()
         {
-            dtpDate.Value =
-                DateTime.Today;
-
-            cmbType.SelectedIndex =
-                0;
-
-            cmbCategory.SelectedIndex =
-                0;
-
+            dtpDate.Value = DateTime.Today;
+            cmbType.SelectedIndex = 0;
+            cmbCategory.SelectedIndex = 0;
             txtDescription.Clear();
-
-            nudAmount.Value =
-                0;
-
+            nudAmount.Value = 0;
             txtDescription.Focus();
         }
     }

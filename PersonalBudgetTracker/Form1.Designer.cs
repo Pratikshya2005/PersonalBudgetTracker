@@ -75,6 +75,21 @@
             this.btnDelete =
                 new System.Windows.Forms.Button();
 
+            this.lblFilterType =
+                new System.Windows.Forms.Label();
+
+            this.cmbFilterType =
+                new System.Windows.Forms.ComboBox();
+
+            this.lblFilterCategory =
+                new System.Windows.Forms.Label();
+
+            this.cmbFilterCategory =
+                new System.Windows.Forms.ComboBox();
+
+            this.btnClearFilter =
+                new System.Windows.Forms.Button();
+
             this.dgvTransactions =
                 new System.Windows.Forms.DataGridView();
 
@@ -437,8 +452,123 @@
                 true;
 
             this.btnDelete.Click +=
+    new System.EventHandler(
+        this.btnDelete_Click);
+
+            // 
+            // lblFilterType
+            // 
+            this.lblFilterType.AutoSize = true;
+
+            this.lblFilterType.Location =
+                new System.Drawing.Point(145, 167);
+
+            this.lblFilterType.Name =
+                "lblFilterType";
+
+            this.lblFilterType.Size =
+                new System.Drawing.Size(43, 15);
+
+            this.lblFilterType.TabIndex =
+                22;
+
+            this.lblFilterType.Text =
+                "Type:";
+
+            // 
+            // cmbFilterType
+            // 
+            this.cmbFilterType.DropDownStyle =
+                System.Windows.Forms.ComboBoxStyle.DropDownList;
+
+            this.cmbFilterType.FormattingEnabled =
+                true;
+
+            this.cmbFilterType.Location =
+                new System.Drawing.Point(192, 163);
+
+            this.cmbFilterType.Name =
+                "cmbFilterType";
+
+            this.cmbFilterType.Size =
+                new System.Drawing.Size(115, 23);
+
+            this.cmbFilterType.TabIndex =
+                23;
+
+            this.cmbFilterType.SelectedIndexChanged +=
                 new System.EventHandler(
-                    this.btnDelete_Click);
+                    this.cmbFilter_SelectedIndexChanged);
+
+            // 
+            // lblFilterCategory
+            // 
+            this.lblFilterCategory.AutoSize = true;
+
+            this.lblFilterCategory.Location =
+                new System.Drawing.Point(323, 167);
+
+            this.lblFilterCategory.Name =
+                "lblFilterCategory";
+
+            this.lblFilterCategory.Size =
+                new System.Drawing.Size(58, 15);
+
+            this.lblFilterCategory.TabIndex =
+                24;
+
+            this.lblFilterCategory.Text =
+                "Category:";
+
+            // 
+            // cmbFilterCategory
+            // 
+            this.cmbFilterCategory.DropDownStyle =
+                System.Windows.Forms.ComboBoxStyle.DropDownList;
+
+            this.cmbFilterCategory.FormattingEnabled =
+                true;
+
+            this.cmbFilterCategory.Location =
+                new System.Drawing.Point(386, 163);
+
+            this.cmbFilterCategory.Name =
+                "cmbFilterCategory";
+
+            this.cmbFilterCategory.Size =
+                new System.Drawing.Size(130, 23);
+
+            this.cmbFilterCategory.TabIndex =
+                25;
+
+            this.cmbFilterCategory.SelectedIndexChanged +=
+                new System.EventHandler(
+                    this.cmbFilter_SelectedIndexChanged);
+
+            // 
+            // btnClearFilter
+            // 
+            this.btnClearFilter.Location =
+                new System.Drawing.Point(532, 159);
+
+            this.btnClearFilter.Name =
+                "btnClearFilter";
+
+            this.btnClearFilter.Size =
+                new System.Drawing.Size(95, 29);
+
+            this.btnClearFilter.TabIndex =
+                26;
+
+            this.btnClearFilter.Text =
+                "Clear Filters";
+
+            this.btnClearFilter.UseVisualStyleBackColor =
+                true;
+
+            this.btnClearFilter.Click +=
+                new System.EventHandler(
+                    this.btnClearFilter_Click);
 
             // 
             // dgvTransactions
@@ -708,6 +838,22 @@
             this.Controls.Add(
                 this.btnDelete);
 
+  
+            this.Controls.Add(
+                this.btnClearFilter);
+
+            this.Controls.Add(
+                this.cmbFilterCategory);
+
+            this.Controls.Add(
+                this.lblFilterCategory);
+
+            this.Controls.Add(
+                this.cmbFilterType);
+
+            this.Controls.Add(
+                this.lblFilterType);
+
             this.Controls.Add(
                 this.lblTransactions);
 
@@ -814,6 +960,16 @@
         private System.Windows.Forms.Label lblTransactions;
 
         private System.Windows.Forms.Button btnDelete;
+
+        private System.Windows.Forms.Label lblFilterType;
+
+        private System.Windows.Forms.ComboBox cmbFilterType;
+
+        private System.Windows.Forms.Label lblFilterCategory;
+
+        private System.Windows.Forms.ComboBox cmbFilterCategory;
+
+        private System.Windows.Forms.Button btnClearFilter;
 
         private System.Windows.Forms.DataGridView dgvTransactions;
 

@@ -10,22 +10,26 @@ namespace PersonalBudgetTracker.Services
 
         public TransactionManager()
         {
-            transactions = new List<Transaction>();
+            transactions =
+                new List<Transaction>();
         }
 
         public List<Transaction> Transactions
         {
             get
             {
-                return new List<Transaction>(transactions);
+                return new List<Transaction>(
+                    transactions);
             }
         }
 
-        public void AddTransaction(Transaction transaction)
+        public void AddTransaction(
+            Transaction transaction)
         {
             if (transaction == null)
             {
-                throw new ArgumentNullException("transaction");
+                throw new ArgumentNullException(
+                    "transaction");
             }
 
             transactions.Add(transaction);
@@ -35,7 +39,8 @@ namespace PersonalBudgetTracker.Services
         {
             Transaction transactionToDelete = null;
 
-            foreach (Transaction transaction in transactions)
+            foreach (Transaction transaction
+                in transactions)
             {
                 if (transaction.Id == id)
                 {
@@ -47,19 +52,23 @@ namespace PersonalBudgetTracker.Services
             if (transactionToDelete == null)
             {
                 throw new InvalidOperationException(
-                    "The selected transaction could not be found.");
+                    "The selected transaction " +
+                    "could not be found.");
             }
 
-            transactions.Remove(transactionToDelete);
+            transactions.Remove(
+                transactionToDelete);
         }
 
         public decimal CalculateTotalIncome()
         {
             decimal total = 0;
 
-            foreach (Transaction transaction in transactions)
+            foreach (Transaction transaction
+                in transactions)
             {
-                if (transaction is IncomeTransaction)
+                if (transaction
+                    is IncomeTransaction)
                 {
                     total += transaction.Amount;
                 }
@@ -72,9 +81,11 @@ namespace PersonalBudgetTracker.Services
         {
             decimal total = 0;
 
-            foreach (Transaction transaction in transactions)
+            foreach (Transaction transaction
+                in transactions)
             {
-                if (transaction is ExpenseTransaction)
+                if (transaction
+                    is ExpenseTransaction)
                 {
                     total += transaction.Amount;
                 }
@@ -87,9 +98,11 @@ namespace PersonalBudgetTracker.Services
         {
             decimal balance = 0;
 
-            foreach (Transaction transaction in transactions)
+            foreach (Transaction transaction
+                in transactions)
             {
-                balance += transaction.GetBalanceEffect();
+                balance +=
+                    transaction.GetBalanceEffect();
             }
 
             return balance;
@@ -105,10 +118,42 @@ namespace PersonalBudgetTracker.Services
                 return;
             }
 
-            foreach (Transaction transaction in savedTransactions)
+            foreach (Transaction transaction
+                in savedTransactions)
             {
                 transactions.Add(transaction);
             }
+        }
+
+        public List<Transaction>
+            GetFilteredTransactions(
+                string selectedType,
+                string selectedCategory)
+        {
+            List<Transaction> filteredTransactions =
+                new List<Transaction>();
+
+            foreach (Transaction transaction
+                in transactions)
+            {
+                bool matchesType =
+                    selectedType == "All Types" ||
+                    transaction.Type == selectedType;
+
+                bool matchesCategory =
+                    selectedCategory == "All Categories" ||
+                    transaction.Category ==
+                    selectedCategory;
+
+                if (matchesType &&
+                    matchesCategory)
+                {
+                    filteredTransactions.Add(
+                        transaction);
+                }
+            }
+
+            return filteredTransactions;
         }
     }
 }
