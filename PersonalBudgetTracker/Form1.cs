@@ -13,6 +13,8 @@ namespace PersonalBudgetTracker
 
         private readonly JsonStorageService storageService;
 
+        private Button btnUpdate;
+
         public Form1()
         {
             transactionManager =
@@ -22,6 +24,7 @@ namespace PersonalBudgetTracker
                 new JsonStorageService();
 
             InitializeComponent();
+            ConfigureEditFeature();
             ConfigureForm();
             LoadSavedTransactions();
             RefreshTransactionGrid();
@@ -227,6 +230,154 @@ namespace PersonalBudgetTracker
             cmbFilterCategory.SelectedIndex = 0;
 
             RefreshTransactionGrid();
+        }
+
+        private void ConfigureEditFeature()
+        {
+            btnUpdate = new Button();
+            btnUpdate.Location =
+                new System.Drawing.Point(640, 159);
+            btnUpdate.Name = "btnUpdate";
+            btnUpdate.Size =
+                new System.Drawing.Size(135, 29);
+            btnUpdate.TabIndex = 27;
+            btnUpdate.Text = "Update Selected";
+            btnUpdate.UseVisualStyleBackColor = true;
+            btnUpdate.Click +=
+                new EventHandler(btnUpdate_Click);
+
+            Controls.Add(btnUpdate);
+
+            dgvTransactions.CellClick +=
+                new DataGridViewCellEventHandler(
+                    dgvTransactions_CellClick);
+        }
+
+        private void dgvTransactions_CellClick(
+            object sender,
+            DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0)
+            {
+                return;
+            }
+
+            DataGridViewRow selectedRow =
+                dgvTransactions.Rows[e.RowIndex];
+
+            object dateValue =
+                selectedRow.Cells["Date"].Value;
+            object typeValue =
+                selectedRow.Cells["Type"].Value;
+            object categoryValue =
+                selectedRow.Cells["Category"].Value;
+            object descriptionValue =
+                selectedRow.Cells["Description"].Value;
+            object amountValue =
+                selectedRow.Cells["Amount"].Value;
+
+            if (dateValue != null)
+            {
+                dtpDate.Value =
+                    Convert.ToDateTime(dateValue);
+            }
+
+            if (typeValue != null)
+            {
+                cmbType.SelectedItem =
+                    typeValue.ToString();
+            }
+
+            if (categoryValue != null)
+            {
+                cmbCategory.SelectedItem =
+                    categoryValue.ToString();
+            }
+
+            txtDescription.Text =
+                descriptionValue == null
+                    ? string.Empty
+                    : descriptionValue.ToString();
+
+            if (amountValue != null)
+            {
+                nudAmount.Value =
+                    Convert.ToDecimal(amountValue);
+            }
+        }
+
+        private void btnUpdate_Click(
+            object sender,
+            EventArgs e)
+        {
+            try
+            {
+                if (dgvTransactions.CurrentRow == null)
+                {
+                    throw new InvalidOperationException(
+                        "Please select a transaction to update.");
+                }
+
+                ValidateTransactionInput();
+
+                object idValue =
+                    dgvTransactions
+                        .CurrentRow
+                        .Cells["Id"]
+                        .Value;
+
+                if (idValue == null)
+                {
+                    throw new InvalidOperationException(
+                        "The selected transaction is invalid.");
+                }
+
+                Guid transactionId =
+                    (Guid)idValue;
+
+                Transaction updatedTransaction;
+
+                if (cmbType.Text == "Income")
+                {
+                    updatedTransaction =
+                        new IncomeTransaction(
+                            dtpDate.Value.Date,
+                            cmbCategory.Text,
+                            txtDescription.Text.Trim(),
+                            nudAmount.Value);
+                }
+                else
+                {
+                    updatedTransaction =
+                        new ExpenseTransaction(
+                            dtpDate.Value.Date,
+                            cmbCategory.Text,
+                            txtDescription.Text.Trim(),
+                            nudAmount.Value);
+                }
+
+                transactionManager.UpdateTransaction(
+                    transactionId,
+                    updatedTransaction);
+
+                SaveTransactions();
+                RefreshTransactionGrid();
+                ClearInputs();
+
+                MessageBox.Show(
+                    "Transaction updated successfully.",
+                    "Transaction Updated",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    ex.Message,
+                    "Unable to Update",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+            }
         }
 
         private void ValidateTransactionInput()

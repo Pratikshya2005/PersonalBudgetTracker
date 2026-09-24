@@ -155,5 +155,33 @@ namespace PersonalBudgetTracker.Services
 
             return filteredTransactions;
         }
+
+        public void UpdateTransaction(
+            Guid id,
+            Transaction updatedTransaction)
+                {
+                    if (updatedTransaction == null)
+                    {
+                        throw new ArgumentNullException(
+                            "updatedTransaction");
+                    }
+
+                    for (int index = 0;
+                        index < transactions.Count;
+                        index++)
+                    {
+                        if (transactions[index].Id == id)
+                        {
+                            updatedTransaction.Id = id;
+                            transactions[index] =
+                                updatedTransaction;
+
+                            return;
+                        }
+                    }
+
+                    throw new InvalidOperationException(
+                        "The selected transaction could not be found.");
+                }
     }
 }
