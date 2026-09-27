@@ -15,6 +15,12 @@ namespace PersonalBudgetTracker
 
         private Button btnUpdate;
 
+        private CheckBox chkUseDateFilter;
+
+        private DateTimePicker dtpFilterStart;
+
+        private DateTimePicker dtpFilterEnd;
+
         public Form1()
         {
             transactionManager =
@@ -25,6 +31,7 @@ namespace PersonalBudgetTracker
 
             InitializeComponent();
             ConfigureEditFeature();
+            ConfigureDateFilterFeature();
             ConfigureForm();
             LoadSavedTransactions();
             RefreshTransactionGrid();
@@ -253,6 +260,89 @@ namespace PersonalBudgetTracker
                     dgvTransactions_CellClick);
         }
 
+        private void ConfigureDateFilterFeature()
+        {
+            dgvTransactions.Location =
+                new System.Drawing.Point(25, 235);
+            dgvTransactions.Size =
+                new System.Drawing.Size(888, 252);
+
+            chkUseDateFilter = new CheckBox();
+            chkUseDateFilter.Location =
+                new System.Drawing.Point(25, 201);
+            chkUseDateFilter.Size =
+                new System.Drawing.Size(125, 24);
+            chkUseDateFilter.Text = "Use date range";
+
+            Label lblFrom = new Label();
+            lblFrom.AutoSize = true;
+            lblFrom.Location =
+                new System.Drawing.Point(160, 204);
+            lblFrom.Text = "From";
+
+            dtpFilterStart = new DateTimePicker();
+            dtpFilterStart.Format =
+                DateTimePickerFormat.Short;
+            dtpFilterStart.Location =
+                new System.Drawing.Point(205, 200);
+            dtpFilterStart.Size =
+                new System.Drawing.Size(125, 22);
+            dtpFilterStart.Value =
+                new DateTime(
+                    DateTime.Today.Year,
+                    DateTime.Today.Month,
+                    1);
+            dtpFilterStart.Enabled = false;
+
+            Label lblTo = new Label();
+            lblTo.AutoSize = true;
+            lblTo.Location =
+                new System.Drawing.Point(345, 204);
+            lblTo.Text = "To";
+
+            dtpFilterEnd = new DateTimePicker();
+            dtpFilterEnd.Format =
+                DateTimePickerFormat.Short;
+            dtpFilterEnd.Location =
+                new System.Drawing.Point(375, 200);
+            dtpFilterEnd.Size =
+                new System.Drawing.Size(125, 22);
+            dtpFilterEnd.Value = DateTime.Today;
+            dtpFilterEnd.Enabled = false;
+
+            chkUseDateFilter.CheckedChanged +=
+                new EventHandler(dateFilter_Changed);
+            dtpFilterStart.ValueChanged +=
+                new EventHandler(dateFilter_Changed);
+            dtpFilterEnd.ValueChanged +=
+                new EventHandler(dateFilter_Changed);
+
+            Controls.Add(chkUseDateFilter);
+            Controls.Add(lblFrom);
+            Controls.Add(dtpFilterStart);
+            Controls.Add(lblTo);
+            Controls.Add(dtpFilterEnd);
+        }
+
+        private void dateFilter_Changed(
+            object sender,
+            EventArgs e)
+        {
+            dtpFilterStart.Enabled =
+                chkUseDateFilter.Checked;
+            dtpFilterEnd.Enabled =
+                chkUseDateFilter.Checked;
+
+            if (chkUseDateFilter.Checked &&
+                dtpFilterStart.Value.Date >
+                dtpFilterEnd.Value.Date)
+            {
+                return;
+            }
+
+            RefreshTransactionGrid();
+        }
+
         private void dgvTransactions_CellClick(
             object sender,
             DataGridViewCellEventArgs e)
@@ -421,10 +511,26 @@ namespace PersonalBudgetTracker
                     ? "All Categories"
                     : cmbFilterCategory.Text;
 
-            List<Transaction> filteredTransactions =
-                transactionManager.GetFilteredTransactions(
-                    selectedType,
-                    selectedCategory);
+            List<Transaction> filteredTransactions;
+
+            if (chkUseDateFilter.Checked)
+            {
+                filteredTransactions =
+                    transactionManager
+                        .GetFilteredTransactionsByDate(
+                            selectedType,
+                            selectedCategory,
+                            dtpFilterStart.Value.Date,
+                            dtpFilterEnd.Value.Date);
+            }
+            else
+            {
+                filteredTransactions =
+                    transactionManager
+                        .GetFilteredTransactions(
+                            selectedType,
+                            selectedCategory);
+            }
 
             dgvTransactions.DataSource = null;
 
@@ -457,22 +563,32 @@ namespace PersonalBudgetTracker
                     .Format = "C2";
             }
 
-            RefreshSummary();
+            RefreshSummary(filteredTransactions);
         }
 
-        private void RefreshSummary()
+        private void RefreshSummary(
+            List<Transaction> displayedTransactions)
         {
-            decimal totalIncome =
-                transactionManager
-                    .CalculateTotalIncome();
+            decimal totalIncome = 0;
+            decimal totalExpenses = 0;
+            decimal balance = 0;
 
-            decimal totalExpenses =
-                transactionManager
-                    .CalculateTotalExpenses();
+            foreach (Transaction transaction
+                in displayedTransactions)
+            {
+                if (transaction is IncomeTransaction)
+                {
+                    totalIncome += transaction.Amount;
+                }
+                else if (transaction
+                    is ExpenseTransaction)
+                {
+                    totalExpenses += transaction.Amount;
+                }
 
-            decimal balance =
-                transactionManager
-                    .CalculateBalance();
+                balance +=
+                    transaction.GetBalanceEffect();
+            }
 
             lblTotalIncome.Text =
                 "Total Income: " +

@@ -156,32 +156,70 @@ namespace PersonalBudgetTracker.Services
             return filteredTransactions;
         }
 
+        public List<Transaction>
+            GetFilteredTransactionsByDate(
+                string selectedType,
+                string selectedCategory,
+                DateTime startDate,
+                DateTime endDate)
+        {
+            if (startDate.Date > endDate.Date)
+            {
+                throw new ArgumentException(
+                    "The start date cannot be after " +
+                    "the end date.");
+            }
+
+            List<Transaction> typeAndCategoryResults =
+                GetFilteredTransactions(
+                    selectedType,
+                    selectedCategory);
+
+            List<Transaction> dateResults =
+                new List<Transaction>();
+
+            foreach (Transaction transaction
+                in typeAndCategoryResults)
+            {
+                bool isInsideDateRange =
+                    transaction.Date.Date >= startDate.Date &&
+                    transaction.Date.Date <= endDate.Date;
+
+                if (isInsideDateRange)
+                {
+                    dateResults.Add(transaction);
+                }
+            }
+
+            return dateResults;
+        }
+
         public void UpdateTransaction(
             Guid id,
             Transaction updatedTransaction)
+        {
+            if (updatedTransaction == null)
+            {
+                throw new ArgumentNullException(
+                    "updatedTransaction");
+            }
+
+            for (int index = 0;
+                index < transactions.Count;
+                index++)
+            {
+                if (transactions[index].Id == id)
                 {
-                    if (updatedTransaction == null)
-                    {
-                        throw new ArgumentNullException(
-                            "updatedTransaction");
-                    }
+                    updatedTransaction.Id = id;
+                    transactions[index] =
+                        updatedTransaction;
 
-                    for (int index = 0;
-                        index < transactions.Count;
-                        index++)
-                    {
-                        if (transactions[index].Id == id)
-                        {
-                            updatedTransaction.Id = id;
-                            transactions[index] =
-                                updatedTransaction;
-
-                            return;
-                        }
-                    }
-
-                    throw new InvalidOperationException(
-                        "The selected transaction could not be found.");
+                    return;
                 }
+            }
+
+            throw new InvalidOperationException(
+                "The selected transaction could not be found.");
+        }
     }
 }
