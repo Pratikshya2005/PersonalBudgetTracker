@@ -194,6 +194,38 @@ namespace PersonalBudgetTracker.Services
             return dateResults;
         }
 
+        public Dictionary<string, decimal>
+            GetExpenseTotalsByCategory()
+        {
+            Dictionary<string, decimal> categoryTotals =
+                new Dictionary<string, decimal>();
+
+            foreach (Transaction transaction
+                in transactions)
+            {
+                if (!(transaction
+                    is ExpenseTransaction))
+                {
+                    continue;
+                }
+
+                if (categoryTotals.ContainsKey(
+                    transaction.Category))
+                {
+                    categoryTotals[transaction.Category] +=
+                        transaction.Amount;
+                }
+                else
+                {
+                    categoryTotals.Add(
+                        transaction.Category,
+                        transaction.Amount);
+                }
+            }
+
+            return categoryTotals;
+        }
+
         public void UpdateTransaction(
             Guid id,
             Transaction updatedTransaction)

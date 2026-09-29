@@ -15,6 +15,8 @@ namespace PersonalBudgetTracker
 
         private Button btnUpdate;
 
+        private Button btnCategorySummary;
+
         private CheckBox chkUseDateFilter;
 
         private DateTimePicker dtpFilterStart;
@@ -32,6 +34,7 @@ namespace PersonalBudgetTracker
             InitializeComponent();
             ConfigureEditFeature();
             ConfigureDateFilterFeature();
+            ConfigureCategorySummaryFeature();
             ConfigureForm();
             LoadSavedTransactions();
             RefreshTransactionGrid();
@@ -341,6 +344,63 @@ namespace PersonalBudgetTracker
             }
 
             RefreshTransactionGrid();
+        }
+
+        private void ConfigureCategorySummaryFeature()
+        {
+            btnCategorySummary = new Button();
+            btnCategorySummary.Location =
+                new System.Drawing.Point(520, 198);
+            btnCategorySummary.Size =
+                new System.Drawing.Size(160, 28);
+            btnCategorySummary.Text =
+                "Expense Summary";
+            btnCategorySummary.UseVisualStyleBackColor =
+                true;
+            btnCategorySummary.Click +=
+                new EventHandler(
+                    btnCategorySummary_Click);
+
+            Controls.Add(btnCategorySummary);
+        }
+
+        private void btnCategorySummary_Click(
+            object sender,
+            EventArgs e)
+        {
+            Dictionary<string, decimal> categoryTotals =
+                transactionManager
+                    .GetExpenseTotalsByCategory();
+
+            if (categoryTotals.Count == 0)
+            {
+                MessageBox.Show(
+                    "There are no expense transactions " +
+                    "to summarise.",
+                    "Expense Summary",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+
+                return;
+            }
+
+            string summaryText =
+                "Expense totals by category:\n\n";
+
+            foreach (KeyValuePair<string, decimal> item
+                in categoryTotals)
+            {
+                summaryText +=
+                    item.Key + ": " +
+                    item.Value.ToString("C2") +
+                    "\n";
+            }
+
+            MessageBox.Show(
+                summaryText,
+                "Expense Summary",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
         }
 
         private void dgvTransactions_CellClick(
