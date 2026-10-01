@@ -1,61 +1,121 @@
 # Personal Budget Tracker
 
-## Project Description
+Personal Budget Tracker is a Windows Forms desktop application for recording personal income and expenses. It allows the user to add, edit, delete, filter, and review transactions while automatically calculating income, expenses, and the current balance.
 
-Personal Budget Tracker is a C# Windows Forms application that helps users record and manage personal income and expenses.
+## Student Details
 
-The application allows the user to add transactions, assign categories, view transactions, filter recorded data, and view total income, expenses, and current balance.
+- Student: Pratikshya Pokhrel
+- Student ID: S2400757
+- Unit: ITS203
+- Project: Assessment C – Personal Budget Tracker
 
-## Current Features
+## Features
 
 - Add income and expense transactions
-- Record transaction date, category, description, and amount
-- Display transactions in a DataGridView
-- Delete selected transactions
-- Calculate total income
-- Calculate total expenses
-- Calculate the current balance
-- Filter transactions by type
+- Store a date, category, description, and amount for each transaction
+- Edit an existing transaction by selecting it from the table
+- Delete a selected transaction with confirmation
+- Display all transactions in a DataGridView
+- Calculate total income, total expenses, and current balance
+- Filter transactions by income or expense type
 - Filter transactions by category
-- Save transactions to a local JSON file
-- Load saved transactions when the application starts
-- Validate user input and display error messages
+- Filter transactions between two selected dates
+- Recalculate totals using the currently displayed transactions
+- Display an expense summary grouped by category
+- Validate required fields, transaction dates, and amounts
+- Automatically save transactions to a local JSON file
+- Automatically reload saved transactions when the program starts
+
+## Technologies Used
+
+- C# 7.3
+- .NET Framework 4.7.2
+- Windows Forms
+- Visual Studio
+- JSON serialization using `JavaScriptSerializer`
+- Git and GitHub for version control
 
 ## Object-Oriented Design
 
-The application currently uses:
+The application uses several object-oriented programming concepts:
 
-- An abstract `Transaction` base class
-- `IncomeTransaction` and `ExpenseTransaction` subclasses
-- Overridden balance calculation methods
-- A `TransactionManager` class to manage transactions
-- A `JsonStorageService` class to save and load data
-- Encapsulation through properties and private collections
-- Exception handling for invalid input and storage errors
+- `Transaction` is an abstract base class containing properties shared by every transaction.
+- `IncomeTransaction` and `ExpenseTransaction` inherit from `Transaction`.
+- Polymorphism is used through the overridden `Type` and `GetBalanceEffect()` members.
+- `TransactionManager` is responsible for managing, filtering, updating, deleting, and summarising transactions.
+- `JsonStorageService` is responsible for saving and loading transaction data.
+- Encapsulation is used by keeping the internal transaction list private and returning a copy through the `Transactions` property.
 
-## Technologies
+## Project Structure
 
-- C#
-- Windows Forms
-- .NET Framework 4.7.2
-- JSON file storage
-- Git and GitHub
+```text
+PersonalBudgetTracker/
+├── Models/
+│   ├── Transaction.cs
+│   ├── IncomeTransaction.cs
+│   ├── ExpenseTransaction.cs
+│   └── TransactionManager.cs
+├── Services/
+│   └── JsonStorageService.cs
+├── Form1.cs
+├── Form1.Designer.cs
+├── Program.cs
+└── PersonalBudgetTracker.csproj
+```
 
-## Running the Application
+## How to Run
 
-1. Open the solution in Microsoft Visual Studio.
-2. Build the solution.
-3. Press F5 or select Start.
-4. Add a transaction using the fields at the top of the form.
+1. Clone or download this repository.
+2. Open the solution in Visual Studio.
+3. Confirm that the project targets .NET Framework 4.7.2.
+4. Select `PersonalBudgetTracker` as the startup project.
+5. Build the solution using **Build > Build Solution**.
+6. Press **F5** or select **Start** to run the application.
 
-## Development Status
+## How to Use
 
-This repository currently represents the Milestone 2 development checkpoint. Additional testing, date filtering, editing functionality, and interface improvements are planned for Milestone 3.
+1. Select the transaction date.
+2. Select Income or Expense.
+3. Select a category.
+4. Enter a description and amount.
+5. Click **Add Transaction**.
+6. Select a row to edit or delete it.
+7. Use the type, category, and date controls to filter the table.
+8. Click **Expense Summary** to view expenses grouped by category.
 
-## References and Tools Used
+## Data Storage
 
-- Microsoft Learn documentation
-- Visual Studio documentation
-- ChatGPT for debugging assistance, code explanations, and implementation guidance
+Transactions are stored in a JSON file inside the current user's local application-data directory:
 
-All generated suggestions were reviewed and tested during development.
+```text
+PersonalBudgetTracker/transactions.json
+```
+
+The application saves the data after adding, editing, or deleting a transaction. Saved data is loaded when the application starts.
+
+## Testing
+
+The application is tested manually using valid and invalid transactions, filters, editing, deletion, calculations, and application restart tests. The complete checklist is available in [TESTING.md](TESTING.md).
+
+## Current Limitations
+
+- The application is designed for one local user.
+- Data is stored locally and is not synchronised online.
+- Categories are predefined.
+- There is no user account or password protection.
+- Reports cannot currently be exported to PDF or Excel.
+
+## Tools and Assistance
+
+- Microsoft Visual Studio was used to design, build, run, and debug the application.
+- Git and GitHub were used for source control and documenting development progress.
+- Microsoft documentation was consulted for Windows Forms and .NET Framework concepts.
+- ChatGPT was used as a development support tool for code suggestions, troubleshooting, documentation structure, and explanations. All suggested code was reviewed, adapted, and tested in the project.
+
+## Repository
+
+[PersonalBudgetTracker on GitHub](https://github.com/Pratikshya2005/PersonalBudgetTracker)
+
+## Author
+
+Pratikshya Pokhrel – S2400757
