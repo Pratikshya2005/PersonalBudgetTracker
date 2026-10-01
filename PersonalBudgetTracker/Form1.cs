@@ -73,6 +73,12 @@ namespace PersonalBudgetTracker
             cmbFilterCategory.SelectedIndex = 0;
 
             dtpDate.Value = DateTime.Today;
+
+            txtDescription.MaxLength = 100;
+
+            nudAmount.DecimalPlaces = 2;
+            nudAmount.Maximum = 1000000;
+            nudAmount.ThousandsSeparator = true;
         }
 
         private void LoadSavedTransactions()
@@ -340,6 +346,13 @@ namespace PersonalBudgetTracker
                 dtpFilterStart.Value.Date >
                 dtpFilterEnd.Value.Date)
             {
+                MessageBox.Show(
+                    "The start date cannot be after " +
+                    "the end date.",
+                    "Invalid Date Range",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+
                 return;
             }
 
@@ -544,11 +557,25 @@ namespace PersonalBudgetTracker
                     "Please select a category.");
             }
 
+            if (dtpDate.Value.Date > DateTime.Today)
+            {
+                throw new ArgumentException(
+                    "The transaction date cannot be " +
+                    "in the future.");
+            }
+
             if (string.IsNullOrWhiteSpace(
                 txtDescription.Text))
             {
                 throw new ArgumentException(
                     "Please enter a transaction description.");
+            }
+
+            if (txtDescription.Text.Trim().Length > 100)
+            {
+                throw new ArgumentException(
+                    "The description cannot be longer " +
+                    "than 100 characters.");
             }
 
             if (nudAmount.Value <= 0)
