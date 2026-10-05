@@ -1,0 +1,114 @@
+# Visual Studio
+.vs/
+.vscode/
+.idea/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.rsuser
+
+# Build results
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]uild/
+[Dd]ist/
+
+# Visual Studio generated files
+*.VC.db
+*.VC.VC.opendb
+*.opendb
+*.sdf
+*.opensdf
+*.cachefile
+*.VC.db-shm
+*.VC.db-wal
+
+# File content indexes
+FileContentIndex/
+*.vsidx
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Test results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+*.trx
+*.coverage
+*.coveragexml
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
+~$*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Rider / JetBrains
+.idea/
+*.sln.iml
+
+# ReSharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# ASP.NET / local settings
+appsettings.Development.json
+appsettings.Local.json
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Database / local data files
+*.db
+*.sqlite
+*.sqlite3
+
+# Publish output
+publish/
+PublishProfiles/
+
+# Backup / migration temp files
+MigrationBackup/
+
+# Generated documentation
+GeneratedDocs/
+
+# Local history
+.history/
